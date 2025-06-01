@@ -163,3 +163,18 @@
       (walk inner outer (list form))
     True
       (outer form)))
+
+
+(defmacro guard [assignment else]
+    (setv _assignment (hy.gensym))
+    `(do 
+        (setv ~_assignment ~assignment)
+        (when (not ~_assignment)
+            ~else)))
+
+
+(defmacro try-else [expression else]
+    `(try 
+        ~expression
+        (except [e Exception]
+            ~else)))

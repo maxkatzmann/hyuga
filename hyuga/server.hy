@@ -7,7 +7,12 @@
                           TEXT_DOCUMENT_DID_CHANGE
                           TEXT_DOCUMENT_DID_CLOSE
                           TEXT_DOCUMENT_DID_OPEN
-                          CompletionOptions])
+                          TEXT_DOCUMENT_DOCUMENT_SYMBOL
+                          CompletionOptions
+                          DocumentSymbol
+                          SymbolKind
+                          Range
+                          Position])
 (import pygls.server [LanguageServer])
 
 (import hyuga.api *)
@@ -115,3 +120,42 @@
   []
   (logger.info f"----- hyuga {(get-version)} start -----")
   ($SERVER.start_io))
+
+(defn create-document-symbol
+  [defclass-data]
+  "Convert defclass data to DocumentSymbol format."
+  (let [type-info (get defclass-data "type")
+        start-line 0
+        start-char 0
+        end-line start-line
+        end-char 0]
+    (DocumentSymbol :name (get type-info "name")
+                    :kind SymbolKind.Class
+                    :range (Range :start (Position :line start-line :character start-char)
+                                  :end (Position :line end-line :character end-char))
+                    :selection_range (Range :start (Position :line start-line :character start-char)
+                                            :end (Position :line end-line :character end-char))
+                    :detail "")))
+
+(defn [($SERVER.feature TEXT_DOCUMENT_DOCUMENT_SYMBOL)] document-symbol
+  [params]
+  "`textDocument/documentSymbol` request handler."
+  (try
+    (let [doc-uri params.text_document.uri
+          root-uri $SERVER.workspace.root_uri]
+;           defclasses (get-defclasses root-uri doc-uri)]
+;       (logger.info f"document-symbol: found {(len defclasses)} defclasses")
+      ; (->> defclasses
+      ;      (.values)
+      ;      (map create-document-symbol)
+      ;      list))
+      [(DocumentSymbol :name "my-class"
+                       :kind SymbolKind.Class
+                       :range (Range :start (Position :line 0 :character 0) 
+                                     :end (Position :line 0 :character 1))
+                       :selection_range (Range :start (Position :line 0 :character 0) 
+                                               :end (Position :line 0 :character 1))
+                       :detail "my-class-detail")])
+    (except [e Exception]
+      (log-error "document-symbol" e)
+      (raise e))))

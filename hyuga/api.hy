@@ -1,8 +1,11 @@
 (require hyrule * :readers *)
-(import hyrule.iterables [butlast drop-last])
 (require hyrule.argmove [-> ->>])
 
+(require hyuga.util [guard try-else])
+
+(import hyrule.iterables [butlast drop-last])
 (import toolz.itertoolz *)
+(import toolz.dicttoolz *)
 (import functools [partial])
 
 (import hyuga.log [logger])
@@ -107,3 +110,35 @@
          ;; TODO: jump by module name(e.g. sym-tgt=hyrule.collections)
          (filter filter-fn)
          tuple)))
+
+(defn get-defclasses
+  [root-uri doc-uri]
+  (logger.debug f"get-defclasses")
+  (let [tgt-scope (uri->mod root-uri doc-uri)
+        _ (logger.debug f"\tgt-scope={tgt-scope}")
+        filter-fn
+        #%(let [[loaded-scope loaded-ns loaded-sym]
+                (get-scope/ns/sym (first %1))
+                loaded-scope (-> %1 second (get "scope"))]
+            (= tgt-scope loaded-scope))]
+        (valfilter filter-fn ($GLOBAL.get-$SYMS))))
+
+
+
+; (defn get-defns [full-sym root-uri doc-uri]
+;   (valfilter 
+;     (fn [symbol] 
+;       (setv type-info (get symbol "type"))
+;       (guard (isinstance type-info dict)
+; 	      (return False))
+;       (return (= (try-else (get type-info "type") "") "defn")))
+;     symbols))
+
+; (defn get-defclasses [symbols]
+;   (valfilter 
+;     (fn [symbol] 
+;       (setv type-info (get symbol "type"))
+;       (guard (isinstance type-info dict)
+; 	(return False))
+;       (return (= (try-else (get type-info "type") "") "defclass")))
+;     symbols))

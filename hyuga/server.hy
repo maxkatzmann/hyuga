@@ -145,6 +145,16 @@
 (defn [($SERVER.feature TEXT_DOCUMENT_DOCUMENT_SYMBOL)] document-symbol
   [params]
   "`textDocument/documentSymbol` request handler."
+  ; Parse again when requesting symbols for a specific file
+  ; TODO: This way the LSP always only knows about the symbols from the current file
+  ($GLOBAL.reset-$SYMS)
+  (load-src! (. ($SERVER.workspace.get_text_document params.text_document.uri) source)
+             $SERVER.workspace.root_uri
+             params.text_document.uri
+             (uri->mod
+               $SERVER.workspace.root_uri
+               params.text_document.uri)
+             True)
   (try
     (let [doc-uri params.text_document.uri
           root-uri $SERVER.workspace.root_uri

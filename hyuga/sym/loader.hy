@@ -1,7 +1,6 @@
 (require hyrule * :readers *)
 (require hyrule.argmove [-> ->>])
 (import hyrule.collections [assoc])
-(import hyrule.collections [walk])
 
 (import hy.models [Expression])
 (import hy.compiler [HyASTCompiler])
@@ -23,6 +22,7 @@
 (import hyuga.sym.filter [filter-add-targets
                           filter-not-reserved])
 (import hyuga.uri.helper [remove-uri-prefix get-venv])
+(import hyuga.util [walk])
 
 (import builtins)
 

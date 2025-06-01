@@ -86,13 +86,13 @@ funcparserlib = ">=1.0,<2.0"
 
 [[package]]
 name = "hyrule"
-version = "0.7.0"
+version = "1.0.0"
 description = "A utility library for the Hy programming language"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "hyrule-0.7.0.tar.gz", hash = "sha256:3a4b3568abfe16d16895e584c0db84c1251d258fe234ba86f072906b90545ce8"},
+    {file = "hyrule-1.0.0.tar.gz", hash = "sha256:499c858d736cead8555a129b6a361e958d03a1162aadc09071d28c342e6de8e8"},
 ]
 
 [package.dependencies]
@@ -230,4 +230,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "3a88aeda8fdeaf8ebb4ffc2fb6754ed9638e9453e49274b3d033d626689fd96f"
+content-hash = "38ee864333cb68f83d8365e1a4f7b01e0d8ef6dcebd42b24b892cdfca93f518e"

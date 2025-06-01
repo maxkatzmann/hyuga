@@ -142,14 +142,14 @@
   "`textDocument/documentSymbol` request handler."
   (try
     (let [doc-uri params.text_document.uri
-          root-uri $SERVER.workspace.root_uri]
-;           defclasses (get-defclasses root-uri doc-uri)]
+          root-uri $SERVER.workspace.root_uri
+          defclasses (get-defclasses)]
 ;       (logger.info f"document-symbol: found {(len defclasses)} defclasses")
       ; (->> defclasses
       ;      (.values)
       ;      (map create-document-symbol)
       ;      list))
-      [(DocumentSymbol :name "my-class"
+      [(DocumentSymbol :name f"classes: {(len defclasses)}"
                        :kind SymbolKind.Class
                        :range (Range :start (Position :line 0 :character 0) 
                                      :end (Position :line 0 :character 1))

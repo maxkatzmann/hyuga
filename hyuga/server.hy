@@ -105,13 +105,17 @@
   [params]
   (try
     (logger.info f"did-change: uri={params.text_document.uri}")
-    (load-src! (. ($SERVER.workspace.get_text_document params.text_document.uri) source)
-               $SERVER.workspace.root_uri
-               params.text_document.uri
-               (uri->mod
+      ; When we do not reset the symbols before loading, the result is the merged set
+      ; of symbols containing the previously existing ones and the new ones. This means
+      ; that removed symbols would still appear here.
+      ($GLOBAL.reset-$SYMS)
+      (load-src! (. ($SERVER.workspace.get_text_document params.text_document.uri) source)
                  $SERVER.workspace.root_uri
-                 params.text_document.uri)
-               True)
+                 params.text_document.uri
+                 (uri->mod
+                   $SERVER.workspace.root_uri
+                   params.text_document.uri)
+                 True)
     (except [e Exception]
       (log-error "did-open" e)
       (raise e))))
@@ -123,16 +127,17 @@
 
 (defn create-document-symbol
   [defclass-data]
-  "Convert defclass data to DocumentSymbol format."
   (let [type-info (get defclass-data "type")
-        start-line 0
-        start-char 0
+        position (get defclass-data "pos")
+        start-line (- (get position 0) 1)
+        start-char (get position 1)
+        name (get type-info "name")
         end-line start-line
-        end-char 0]
-    (DocumentSymbol :name (get type-info "name")
+        end-char (+ start-char (len name))]
+    (DocumentSymbol :name name
                     :kind SymbolKind.Class
                     :range (Range :start (Position :line start-line :character start-char)
-                                  :end (Position :line end-line :character end-char))
+                                  :end   (Position :line end-line :character end-char))
                     :selection_range (Range :start (Position :line start-line :character start-char)
                                             :end (Position :line end-line :character end-char))
                     :detail "")))
@@ -143,19 +148,8 @@
   (try
     (let [doc-uri params.text_document.uri
           root-uri $SERVER.workspace.root_uri
-          defclasses (get-defclasses)]
-;       (logger.info f"document-symbol: found {(len defclasses)} defclasses")
-      ; (->> defclasses
-      ;      (.values)
-      ;      (map create-document-symbol)
-      ;      list))
-      [(DocumentSymbol :name f"classes: {(len defclasses)}"
-                       :kind SymbolKind.Class
-                       :range (Range :start (Position :line 0 :character 0) 
-                                     :end (Position :line 0 :character 1))
-                       :selection_range (Range :start (Position :line 0 :character 0) 
-                                               :end (Position :line 0 :character 1))
-                       :detail "my-class-detail")])
+          defclasses (.values (get-defclasses root-uri doc-uri))]
+      (list (map create-document-symbol defclasses)))
     (except [e Exception]
       (log-error "document-symbol" e)
       (raise e))))

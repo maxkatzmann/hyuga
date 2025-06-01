@@ -36,6 +36,9 @@
          (map #%(.pop self.$SYMS %1))
          tuple))
 
+  (defn reset-$SYMS [self]
+    (.clear self.$SYMS))
+
   (defn get-$SYMS
     [self]
     ;; FIXME: why suddenly added malformed symdata?(e.g. hy module)

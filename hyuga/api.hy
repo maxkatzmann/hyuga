@@ -120,11 +120,12 @@
 ;       (return (= (try-else (get type-info "type") "") "defn")))
 ;     symbols))
 
-(defn get-defclasses []
-  (valfilter 
-    (fn [symbol] 
-      (setv type-info (get symbol "type"))
-      (guard (isinstance type-info dict)
-	(return False))
-      (return (= (try-else (get type-info "type") "") "defclass")))
-    ($GLOBAL.get-$SYMS)))
+(defn get-defclasses [root-uri doc-uri]
+  (let [tgt-scope (uri->mod root-uri doc-uri)]
+    (valfilter 
+      (fn [symbol] 
+        (setv type-info (get symbol "type"))
+        (guard (isinstance type-info dict)
+	         (return False))
+        (return (= (try-else (get type-info "type") "") "defclass")))
+    ($GLOBAL.get-$SYMS))))

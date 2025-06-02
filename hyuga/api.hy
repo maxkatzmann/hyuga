@@ -115,6 +115,9 @@
   (let [tgt-scope (uri->mod root-uri doc-uri)]
     (valfilter 
       (fn [symbol] 
+        (guard (= (get symbol "uri") doc-uri)
+          (return False))
+
         (setv type-info (get symbol "type"))
         (guard (isinstance type-info dict)
 	         (return False))

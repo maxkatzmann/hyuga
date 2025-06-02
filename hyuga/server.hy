@@ -146,6 +146,29 @@
                                             :end (Position :line end-line :character end-char))
                     :detail "")))
 
+(defn get-debug-symbols [root-uri doc-uri]
+  [(DocumentSymbol :name root-uri
+                    :kind SymbolKind.Function
+                    :range (Range :start (Position :line 1 :character 1)
+                                  :end   (Position :line 1 :character 2))
+                    :selection_range (Range :start (Position :line 1 :character 1)
+                                  :end   (Position :line 1 :character 2))
+                    :detail "")
+
+    (DocumentSymbol :name doc-uri
+                    :kind SymbolKind.Class
+                    :range (Range :start (Position :line 1 :character 1)
+                                  :end   (Position :line 1 :character 2))
+                    :selection_range (Range :start (Position :line 1 :character 1)
+                                  :end   (Position :line 1 :character 2))
+                    :detail "")]
+)
+
+; This is what we get from the debug symbols in server.hy:
+; file:///Users/mkatzmann/Documents/Development/util/hyuga Function
+; file:///Users/mkatzmann/Documents/Development/util/hyuga/hyuga/server.hy Class
+; So this does what it is supposed to do. 
+
 (defn [($SERVER.feature TEXT_DOCUMENT_DOCUMENT_SYMBOL)] document-symbol
   [params]
   "`textDocument/documentSymbol` request handler."

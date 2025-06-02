@@ -111,21 +111,12 @@
          (filter filter-fn)
          tuple)))
 
-; (defn get-defns [full-sym root-uri doc-uri]
-;   (valfilter 
-;     (fn [symbol] 
-;       (setv type-info (get symbol "type"))
-;       (guard (isinstance type-info dict)
-; 	      (return False))
-;       (return (= (try-else (get type-info "type") "") "defn")))
-;     symbols))
-
-(defn get-defclasses [root-uri doc-uri]
+(defn get-symbols [root-uri doc-uri]
   (let [tgt-scope (uri->mod root-uri doc-uri)]
     (valfilter 
       (fn [symbol] 
         (setv type-info (get symbol "type"))
         (guard (isinstance type-info dict)
 	         (return False))
-        (return (= (try-else (get type-info "type") "") "defclass")))
+        (return (in (try-else (get type-info "type") "") ["defclass" "defn"])))
     ($GLOBAL.get-$SYMS))))

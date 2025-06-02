@@ -126,16 +126,20 @@
   ($SERVER.start_io))
 
 (defn create-document-symbol
-  [defclass-data]
-  (let [type-info (get defclass-data "type")
-        position (get defclass-data "pos")
+  [data]
+  (let [type-info (get data "type")
+        position (get data "pos")
         start-line (- (get position 0) 1)
         start-char (get position 1)
         name (get type-info "name")
         end-line start-line
         end-char (+ start-char (len name))]
+    (setv kind (match (get type-info "type")
+                  "defclass" SymbolKind.Class
+                  "defn" SymbolKind.Function))
     (DocumentSymbol :name name
-                    :kind SymbolKind.Class
+                    ; FIXME: We need to get the symbol name depending on the actual data.
+                    :kind kind
                     :range (Range :start (Position :line start-line :character start-char)
                                   :end   (Position :line end-line :character end-char))
                     :selection_range (Range :start (Position :line start-line :character start-char)
@@ -147,6 +151,7 @@
   "`textDocument/documentSymbol` request handler."
   ; Parse again when requesting symbols for a specific file
   ; TODO: This way the LSP always only knows about the symbols from the current file
+  ; FIXME: This is dusplicated code.
   ($GLOBAL.reset-$SYMS)
   (load-src! (. ($SERVER.workspace.get_text_document params.text_document.uri) source)
              $SERVER.workspace.root_uri
@@ -158,8 +163,8 @@
   (try
     (let [doc-uri params.text_document.uri
           root-uri $SERVER.workspace.root_uri
-          defclasses (.values (get-defclasses root-uri doc-uri))]
-      (list (map create-document-symbol defclasses)))
+          symbols-data (.values (get-symbols root-uri doc-uri))]
+      (list (map create-document-symbol symbols-data)))
     (except [e Exception]
       (log-error "document-symbol" e)
       (raise e))))

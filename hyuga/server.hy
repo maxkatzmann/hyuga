@@ -136,9 +136,10 @@
         end-char (+ start-char (len name))]
     (setv kind (match (get type-info "type")
                   "defclass" SymbolKind.Class
-                  "defn" SymbolKind.Function))
+                  "defn" SymbolKind.Function
+                  "defmain" SymbolKind.Function
+                  "meth" SymbolKind.Function))
     (DocumentSymbol :name name
-                    ; FIXME: We need to get the symbol name depending on the actual data.
                     :kind kind
                     :range (Range :start (Position :line start-line :character start-char)
                                   :end   (Position :line end-line :character end-char))

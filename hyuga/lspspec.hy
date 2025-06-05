@@ -31,6 +31,8 @@
   [summary]
   (branch (= it (:type summary))
           "defn" CompletionItemKind.Function
+          "meth" CompletionItemKind.Function
+          "defmain" CompletionItemKind.Function
           "defclass" CompletionItemKind.Class
           ;; FIXME: pygls CompletionItemKind.Macro is not defined yet.
           "defmacro" CompletionItemKind.Keyword

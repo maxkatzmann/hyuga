@@ -75,7 +75,8 @@
       (or (.startswith sym "require")
           (.startswith sym "import")
           (.startswith sym "setv")
-          (.startswith sym "def")))
+          (.startswith sym "def")
+          (.startswith sym "meth")))
     False))
 
 (defn eval-in!
@@ -190,6 +191,7 @@
                      (= "require" hytype)))
         (load-required-macros! summary ns doc-uri recur?))
       (when (or (.startswith hytype "def")
+                (= hytype "meth")
                 (= hytype "setv"))
         (load-sym! ns
                    #(#(name summary))

@@ -121,5 +121,5 @@
         (setv type-info (get symbol "type"))
         (guard (isinstance type-info dict)
 	         (return False))
-        (return (in (try-else (get type-info "type") "") ["defclass" "defn"])))
+        (return (in (try-else (get type-info "type") "") ["defclass" "defn" "defmain" "meth"])))
     ($GLOBAL.get-$SYMS))))

@@ -5,8 +5,8 @@ Forked from [hyuga](https://github.com/sakuraiyuta/hyuga). The intention was
 to add `textDocument/documentSymbol` support so that I could list / jump to /
 highlight functions and classes in my code. Since my hy skills are rather
 limited, the result is rather hacky and probably not very performant. For this
-reason, I did not intend to try and propose including these additions upstream.
-So far it's working for me.
+reason, I did not intend to propose including these additions upstream. So far
+it's working for me.
 
 **This software is still in the experimental stage!**
 
@@ -20,8 +20,6 @@ So far it's working for me.
 - `textDocument/documentSymbol`
 
 ## Install
-
-### Global Install
 
 ```bash
 pipx install git+https://github.com/maxkatzmann/hyuga.git
@@ -55,7 +53,7 @@ vim.lsp.enable 'hy'
 ### Setup
 
 - Install [poetry](https://github.com/python-poetry/poetry).
-- Clone this project: `git clone https://github.com/maxkatzmann/hyuga.git
+- Clone this project: `git clone https://github.com/maxkatzmann/hyuga.git`
 - In project directory, execute `poetry install`.
 
 ### Run

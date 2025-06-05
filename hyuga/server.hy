@@ -101,6 +101,15 @@
   [params]
   None)
 
+(defn reload-symbols [uri] 
+  ($GLOBAL.reset-$SYMS)
+  (load-src! 
+    (. ($SERVER.workspace.get_text_document uri) source)
+    $SERVER.workspace.root_uri
+    uri
+    (uri->mod $SERVER.workspace.root_uri uri)
+    True))
+
 (defn [($SERVER.feature TEXT_DOCUMENT_DID_CHANGE)] did-change
   [params]
   (try
@@ -108,14 +117,7 @@
       ; When we do not reset the symbols before loading, the result is the merged set
       ; of symbols containing the previously existing ones and the new ones. This means
       ; that removed symbols would still appear here.
-      ($GLOBAL.reset-$SYMS)
-      (load-src! (. ($SERVER.workspace.get_text_document params.text_document.uri) source)
-                 $SERVER.workspace.root_uri
-                 params.text_document.uri
-                 (uri->mod
-                   $SERVER.workspace.root_uri
-                   params.text_document.uri)
-                 True)
+      (reload-symbols params.text_document.uri)
     (except [e Exception]
       (log-error "did-open" e)
       (raise e))))
@@ -148,42 +150,11 @@
                                             :end (Position :line end-line :character end-char))
                     :detail "")))
 
-(defn get-debug-symbols [root-uri doc-uri]
-  [(DocumentSymbol :name root-uri
-                    :kind SymbolKind.Function
-                    :range (Range :start (Position :line 1 :character 1)
-                                  :end   (Position :line 1 :character 2))
-                    :selection_range (Range :start (Position :line 1 :character 1)
-                                  :end   (Position :line 1 :character 2))
-                    :detail "")
-
-    (DocumentSymbol :name doc-uri
-                    :kind SymbolKind.Class
-                    :range (Range :start (Position :line 1 :character 1)
-                                  :end   (Position :line 1 :character 2))
-                    :selection_range (Range :start (Position :line 1 :character 1)
-                                  :end   (Position :line 1 :character 2))
-                    :detail "")])
-
-; This is what we get from the debug symbols in server.hy:
-; file:///Users/mkatzmann/Documents/Development/util/hyuga Function
-; file:///Users/mkatzmann/Documents/Development/util/hyuga/hyuga/server.hy Class
-; So this does what it is supposed to do. 
-
 (defn [($SERVER.feature TEXT_DOCUMENT_DOCUMENT_SYMBOL)] document-symbol
   [params]
   "`textDocument/documentSymbol` request handler."
   ; Parse again when requesting symbols for a specific file
-  ; TODO: This way the LSP always only knows about the symbols from the current file
-  ; FIXME: This is dusplicated code.
-  ($GLOBAL.reset-$SYMS)
-  (load-src! (. ($SERVER.workspace.get_text_document params.text_document.uri) source)
-             $SERVER.workspace.root_uri
-             params.text_document.uri
-             (uri->mod
-               $SERVER.workspace.root_uri
-               params.text_document.uri)
-             True)
+  (reload-symbols params.text_document.uri)
   (try
     (let [doc-uri params.text_document.uri
           root-uri $SERVER.workspace.root_uri

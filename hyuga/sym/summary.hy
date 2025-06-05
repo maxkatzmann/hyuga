@@ -15,13 +15,16 @@
              "docs" ""
              "decorators" None
              "args" ""
-             "pos" None})
+             "pos" None
+             "end" None})
   (if (-> form second (isinstance List))
     (do
       (.update ret {"decorator" (second form)})
       (.update ret {"name" (->> form (nth 2) fix-hy-symbol)})
       (.update ret {"pos" #((getattr (nth 2 form) "start_line")
                             (getattr (nth 2 form) "start_column"))})
+      (.update ret {"end" #((getattr (last form) "end_line")
+                            (getattr (last form) "end_column"))})
       (.update ret {"args" (nth 3 form)})
       (when (isinstance (nth 4 form) String)
         (.update ret {"docs" (->> (nth 4 form) str)})))
@@ -29,6 +32,8 @@
       (.update ret {"name" (-> form second fix-hy-symbol)})
       (.update ret {"pos" #((getattr (second form) "start_line")
                             (getattr (second form) "start_column"))})
+      (.update ret {"end" #((getattr (last form) "end_line")
+                            (getattr (last form) "end_column"))})
       (.update ret {"args" (->> form (nth 2))})
       (when (isinstance (nth 3 form) String)
         (.update ret {"docs" (-> (nth 3 form) str)}))))
@@ -42,13 +47,16 @@
              "docs" ""
              "decorators" None
              "args" ""
-             "pos" None})
+             "pos" None
+             "end" None})
   (if (-> form second (isinstance List))
     (do
       (.update ret {"decorator" (second form)})
       (.update ret {"name" (->> form (nth 2) fix-hy-symbol)})
       (.update ret {"pos" #((getattr (nth 2 form) "start_line")
                             (getattr (nth 2 form) "start_column"))})
+      (.update ret {"end" #((getattr (last form) "end_line")
+                            (getattr (last form) "end_column"))})
       (.update ret {"args" (nth 3 form)})
       (when (isinstance (nth 4 form) String)
         (.update ret {"docs" (->> (nth 4 form) str)})))
@@ -56,6 +64,8 @@
       (.update ret {"name" (-> form second fix-hy-symbol)})
       (.update ret {"pos" #((getattr (second form) "start_line")
                             (getattr (second form) "start_column"))})
+      (.update ret {"end" #((getattr (last form) "end_line")
+                            (getattr (last form) "end_column"))})
       (.update ret {"args" (->> form (nth 2))})
       (when (isinstance (nth 3 form) String)
         (.update ret {"docs" (-> (nth 3 form) str)}))))
@@ -68,19 +78,24 @@
              "docs" ""
              "decorators" None
              "args" ""
-             "pos" None})
+             "pos" None
+             "end" None})
   (if (-> form second (isinstance List))
     (do
       (.update ret {"decorator" (second form)})
       (.update ret {"name" "main"})
       (.update ret {"pos" #((getattr (nth 0 form) "start_line")
                             (getattr (nth 0 form) "start_column"))})
+      (.update ret {"end" #((getattr (last form) "end_line")
+                            (getattr (last form) "end_column"))})
       (.update ret {"args" (nth 1 form)})
       (when (isinstance (nth 2 form) String)
         (.update ret {"docs" (->> (nth 2 form) str)})))
     (do
       (.update ret {"pos" #((getattr (first form) "start_line")
                             (getattr (first form) "start_column"))})
+      (.update ret {"end" #((getattr (last form) "end_line")
+                            (getattr (last form) "end_column"))})
       (.update ret {"args" (->> form (nth 2))})
       (when (isinstance (nth 3 form) String)
         (.update ret {"docs" (-> (nth 3 form) str)}))))
@@ -108,7 +123,9 @@
              "inherits" (nth 2 form)
              "methods" []
              "pos" #((getattr (second form) "start_line")
-                     (getattr (second form) "start_column"))})
+                     (getattr (second form) "start_column"))
+             "end" #((getattr (last form) "end_line")
+                     (getattr (last form) "end_column"))})
   (let [doc-exists? (isinstance (nth 3 form) String)
         method-forms (if doc-exists?
                        (drop 3 form)
@@ -127,7 +144,9 @@
    "value" (nth 2 form)
    "docs" (->> form (nth 2) fix-hy-symbol)
    "pos" #((getattr (second form) "start_line")
-           (getattr (second form) "start_column"))})
+           (getattr (second form) "start_column"))
+   "end" #((getattr (last form) "end_line")
+           (getattr (last form) "end_column"))})
 
 (defn get-import-summary
   [form]
@@ -135,6 +154,8 @@
              "type" "import"
              "pos" #((getattr (second form) "start_line")
                      (getattr (second form) "start_column"))
+             "end" #((getattr (last form) "end_line")
+                     (getattr (last form) "end_column"))
              "includes" None})
   (let [options (list (drop 2 form))]
     ;; TODO: multiple import support(e.g. (import a.b x.y))
@@ -159,6 +180,8 @@
              "type" "require"
              "pos" #((getattr (second form) "start_line")
                      (getattr (second form) "start_column"))
+             "end" #((getattr (last form) "end_line")
+                     (getattr (last form) "end_column"))
              "includes" []})
   ret)
 
@@ -170,6 +193,8 @@
              "type" "defmacro"
              "pos" #((getattr (second form) "start_line")
                      (getattr (second form) "start_column"))
+             "end" #((getattr (last form) "end_line")
+                     (getattr (last form) "end_column"))
              "includes" []})
   ret)
 
@@ -179,7 +204,9 @@
   {"name" (-> form second fix-hy-symbol)
    "type" (-> form first fix-hy-symbol)
    "pos" #((getattr (second form) "start_line")
-           (getattr (second form) "start_column"))})
+           (getattr (second form) "start_column"))
+   "end" #((getattr (last form) "end_line")
+           (getattr (last form) "end_column"))})
 
 (defn get-form-summary
   [form]

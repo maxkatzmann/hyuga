@@ -132,8 +132,9 @@
         start-line (- (get position 0) 1)
         start-char (get position 1)
         name (get type-info "name")
-        end-line start-line
-        end-char (+ start-char (len name))]
+        end (get type-info "end")
+        end-line (- (get end 0) 1)
+        end-char (get end 1)]
     (setv kind (match (get type-info "type")
                   "defclass" SymbolKind.Class
                   "defn" SymbolKind.Function
@@ -162,8 +163,7 @@
                                   :end   (Position :line 1 :character 2))
                     :selection_range (Range :start (Position :line 1 :character 1)
                                   :end   (Position :line 1 :character 2))
-                    :detail "")]
-)
+                    :detail "")])
 
 ; This is what we get from the debug symbols in server.hy:
 ; file:///Users/mkatzmann/Documents/Development/util/hyuga Function

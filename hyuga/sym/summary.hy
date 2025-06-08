@@ -35,8 +35,8 @@
       (.update ret {"end" #((getattr (last form) "end_line")
                             (getattr (last form) "end_column"))})
       (.update ret {"args" (->> form (nth 2))})
-      (when (isinstance (nth 3 form) String)
-        (.update ret {"docs" (-> (nth 3 form) str)}))))
+      (when (isinstance (nth 2 form) String)
+        (.update ret {"docs" (-> (nth 2 form) str)}))))
   ret)
 
 
@@ -67,8 +67,8 @@
       (.update ret {"end" #((getattr (last form) "end_line")
                             (getattr (last form) "end_column"))})
       (.update ret {"args" (->> form (nth 2))})
-      (when (isinstance (nth 3 form) String)
-        (.update ret {"docs" (-> (nth 3 form) str)}))))
+      (when (isinstance (nth 2 form) String)
+        (.update ret {"docs" (-> (nth 2 form) str)}))))
   ret)
 
 (defn get-defmain-summary

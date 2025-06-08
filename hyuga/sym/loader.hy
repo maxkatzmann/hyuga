@@ -190,7 +190,7 @@
                  (or (= "defreader" hytype)
                      (= "require" hytype)))
         (load-required-macros! summary ns doc-uri recur?))
-      (when (or (.startswith hytype "def")
+      (when (or (and (is-not hytype None) (.startswith hytype "def"))
                 (= hytype "meth")
                 (= hytype "setv"))
         (load-sym! ns

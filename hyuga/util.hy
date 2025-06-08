@@ -178,3 +178,9 @@
         ~expression
         (except [e Exception]
             ~else)))
+
+(defn read-from-file [file]
+    (try-else
+        (with [f (open file "rt")]
+            (return (.read f)))
+        (return None)))

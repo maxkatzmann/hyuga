@@ -4,6 +4,7 @@
 (require hyuga.util [guard try-else])
 
 (import hyrule.iterables [butlast drop-last])
+(import hyrule.collections [assoc])
 (import toolz.itertoolz *)
 (import toolz.dicttoolz *)
 (import functools [partial])
@@ -113,7 +114,7 @@
 
 (defn get-symbols [root-uri doc-uri]
   (let [tgt-scope (uri->mod root-uri doc-uri)]
-    (valfilter 
+    (setv symbols (valfilter 
       (fn [symbol] 
         (guard (= (get symbol "uri") doc-uri)
           (return False))
@@ -123,3 +124,28 @@
 	         (return False))
         (return (in (try-else (get type-info "type") "") ["defclass" "defn" "defmain" "meth"])))
     ($GLOBAL.get-$SYMS))))
+    
+    ; FIXME: We sometimes see the same symbol twice: Once in a class definition and once outside of it.
+    ; E.g., "\\.None\\LLMService.run-tasks" and "\\.None\\run-tasks"
+    ; Instead of fixing the core issue that leads to this, we decide to try and remove duplicates here.
+    (setv unique-names {})
+    (for [symbol (symbols.items)]
+      (setv name (first symbol)
+            data (second symbol)
+            pos (get data "pos"))
+
+      ; When we haven't seen the symbol, yet, we mark it as seen.
+      (when (not-in pos unique-names)
+        (assoc unique-names pos name)
+        (continue))
+
+      ; Otherwise, we only add the new symbol if its name is longer than the
+      ; one we have already seen.
+      (setv existing-name (get unique-names pos))
+      (when (< (len existing-name) (len name))
+        ; We found a more specific symbol definition so we overwrite the existing one
+        (assoc unique-names pos name)))
+
+    ; Collect the symbols belonging to the unique names
+    (dfor name (unique-names.values) 
+      name (get symbols name)))
